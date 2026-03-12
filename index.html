@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Sawit Project Kilzz</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Courier New',monospace}
+        body{
+            min-height:100vh;
+            background:linear-gradient(145deg,#1a0a0a,#5a2a2a);
+            overflow:hidden;
+            padding:20px;
+            position:relative
+        }
+        .snow{
+            position:fixed;
+            top:0;left:0;
+            width:100%;height:100%;
+            pointer-events:none;
+            z-index:1
+        }
+        .snow i{
+            position:absolute;
+            top:-20px;
+            border-radius:50%;
+            background:rgba(200,50,50,0.7);
+            box-shadow:0 0 15px #f55;
+            animation:jatuh linear infinite
+        }
+        @keyframes jatuh{to{transform:translateY(100vh)}}
+        .container{
+            position:relative;
+            z-index:10;
+            max-width:1200px;
+            margin:0 auto;
+            background:rgba(30,10,10,0.85);
+            backdrop-filter:blur(10px);
+            border-radius:50px;
+            padding:30px;
+            border:2px solid #f88;
+            box-shadow:0 20px 50px #300
+        }
+        h1{
+            text-align:center;
+            font-size:4rem;
+            color:#faa;
+            text-shadow:0 0 20px red,5px 5px 0 #500;
+            margin-bottom:20px
+        }
+        .btn-group{
+            display:flex;
+            justify-content:center;
+            gap:20px;
+            margin-bottom:25px
+        }
+        .btn{
+            padding:15px 30px;
+            font-size:1.5rem;
+            font-weight:bold;
+            border:none;
+            border-radius:60px;
+            cursor:pointer;
+            box-shadow:0 8px 0 #400;
+            transition:0.2s;
+            text-transform:uppercase
+        }
+        .btn-run{background:linear-gradient(#c33,#f55);color:#fff}
+        .btn-cmd{background:linear-gradient(#633,#955);color:#fdd}
+        .btn:hover{transform:translateY(-5px);box-shadow:0 13px 0 #400}
+        .btn:active{transform:translateY(5px);box-shadow:0 3px 0 #400}
+        
+        .input-line{
+            background:#200;
+            border:2px solid #a44;
+            border-radius:60px;
+            padding:10px 20px;
+            margin-bottom:20px;
+            display:flex;
+            gap:10px
+        }
+        .input-line input{
+            flex:1;
+            background:transparent;
+            border:none;
+            color:#faa;
+            font-size:1.2rem;
+            padding:10px;
+            outline:none
+        }
+        .input-line input::placeholder{color:#a55}
+        .btn-exe{
+            background:#a33;
+            border:none;
+            color:#fff;
+            padding:10px 25px;
+            border-radius:40px;
+            font-weight:bold;
+            cursor:pointer;
+            box-shadow:0 5px 0 #500
+        }
+        .btn-exe:hover{background:#c55;transform:translateY(-3px)}
+        
+        .output{
+            background:#100;
+            border:2px solid #a44;
+            border-radius:30px;
+            padding:20px;
+            min-height:180px;
+            max-height:300px;
+            overflow-y:auto;
+            color:#faa;
+            font-size:1rem;
+            margin-bottom:20px
+        }
+        .output .title{
+            color:#f88;
+            border-bottom:1px solid #a44;
+            padding-bottom:5px;
+            margin-bottom:10px
+        }
+        .cmd-grid{
+            display:none;
+            grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+            gap:10px;
+            max-height:400px;
+            overflow-y:auto;
+            padding:10px
+        }
+        .cmd-grid.show{display:grid}
+        .cmd-item{
+            background:#200;
+            border:2px solid #a55;
+            border-radius:20px;
+            padding:15px;
+            cursor:pointer;
+            transition:0.2s
+        }
+        .cmd-item:hover{
+            background:#400;
+            border-color:#f88;
+            transform:scale(1.02)
+        }
+        .cmd-name{font-weight:bold;color:#faa;font-size:1.3rem}
+        .cmd-desc{color:#d99;font-size:0.9rem;margin:5px 0}
+        .cmd-example{background:#300;padding:8px;border-radius:10px;color:#fb9;font-size:0.8rem}
+        .cmd-tag{
+            display:inline-block;
+            background:#a33;
+            color:#fff;
+            padding:3px 10px;
+            border-radius:20px;
+            font-size:0.7rem;
+            margin-top:8px
+        }
+    </style>
+</head>
+<body>
+    <div class="snow" id="snow"></div>
+    <div class="container">
+        <h1>PROGRAM SAWIT BY KILZZ🗿🌴 </h1>
+        
+        <div class="btn-group">
+            <button class="btn btn-run" onclick="runSawit()">▶ RUN</button>
+            <button class="btn btn-cmd" onclick="toggleCmd()">📋 COMMANDS</button>
+        </div>
+        
+        <div class="input-line">
+            <input id="cmdInput" placeholder="> ketik command sawit..." onkeypress="if(event.key==='Enter') executeCmd()">
+            <button class="btn-exe" onclick="executeCmd()">EXEC</button>
+        </div>
+        
+        <div class="output" id="output">
+            <div class="title">🌾 OUTPUT:</div>
+            <div id="outputText">Bahasa Sawit siap digunakan😹<br>Ketik command biar bisa su🗿</div>
+        </div>
+        
+        <div class="cmd-grid" id="cmdGrid"></div>
+    </div>
+
+    <script>
+        // Snow
+        for(let i=30;i--;){
+            let s=document.createElement('i')
+            s.style.left=Math.random()*100+'%'
+            s.style.animationDuration=Math.random()*4+3+'s'
+            s.style.width=s.style.height=Math.random()*12+4+'px'
+            s.style.background=`rgba(200,${30+Math.random()*40},${30+Math.random()*40},0.7)`
+            document.getElementById('snow').appendChild(s)
+        }
+
+        // COMMAND SAWIT LENGKAP
+        let commands = [
+            // BASIC COMMANDS
+            {name:'TANAM', desc:'Menanam bibit sawit baru', example:'TANAM 5', tag:'#basic'},
+            {name:'PANEN', desc:'Memanen hasil sawit', example:'PANEN hasil', tag:'#basic'},
+            {name:'BIBIT', desc:'Membuat variabel bibit', example:'BIBIT x = 10', tag:'#basic'},
+            {name:'PUPUK', desc:'Menambah nilai variabel', example:'PUPUK x + 5', tag:'#math'},
+            {name:'TEBANG', desc:'Menghapus semua variabel', example:'TEBANG', tag:'#danger'},
+            
+            // OUTPUT COMMANDS
+            {name:'SAWIT.LOG', desc:'Mencetak output', example:'SAWIT.LOG "hasil panen"', tag:'#output'},
+            {name:'SAWIT.INFO', desc:'Menampilkan info sistem', example:'SAWIT.INFO', tag:'#info'},
+            {name:'SAWIT.VERSI', desc:'Melihat versi bahasa', example:'SAWIT.VERSI', tag:'#system'},
+            {name:'SAWIT.HELP', desc:'Menampilkan bantuan', example:'SAWIT.HELP', tag:'#system'},
+            {name:'SAWIT.CLEAR', desc:'Membersihkan layar', example:'SAWIT.CLEAR', tag:'#system'},
+            
+            // MATH COMMANDS
+            {name:'HITUNG', desc:'Menghitung matematika', example:'HITUNG x * y', tag:'#math'},
+            {name:'TAMBAH', desc:'Penjumlahan', example:'TAMBAH a b', tag:'#math'},
+            {name:'KURANG', desc:'Pengurangan', example:'KURANG a b', tag:'#math'},
+            {name:'KALI', desc:'Perkalian', example:'KALI a b', tag:'#math'},
+            {name:'BAGI', desc:'Pembagian', example:'BAGI a b', tag:'#math'},
+            
+            // LOGIC COMMANDS
+            {name:'SAWIT.JIKA', desc:'Percabangan kondisi', example:'SAWIT.JIKA (x>5) { PANEN }', tag:'#logic'},
+            {name:'SAWIT.ULANG', desc:'Perulangan', example:'SAWIT.ULANG (i<10) { TANAM }', tag:'#loop'},
+            {name:'SAWIT.UNTUK', desc:'For loop', example:'SAWIT.UNTUK i=1 to 5', tag:'#loop'},
+            {name:'SAWIT.SELAMA', desc:'While loop', example:'SAWIT.SELAMA (x<10)', tag:'#loop'},
+            
+            // SAWIT SPESIFIC
+            {name:'HAMA', desc:'Cek hama pada sawit', example:'HAMA cek', tag:'#sawit'},
+            {name:'BASAH', desc:'Cek kelembaban tanah', example:'BASAH tanah', tag:'#sawit'},
+            {name:'KERING', desc:'Cek kekeringan', example:'KERING sawit', tag:'#sawit'},
+            {name:'PANEN_RAYA', desc:'Memanen semua sawit', example:'PANEN_RAYA', tag:'#sawit'},
+            {name:'BIBIT_UNGGUL', desc:'Beli bibit unggul', example:'BIBIT_UNGGUL 5', tag:'#ekonomi'},
+            {name:'JUAL_SAWIT', desc:'Jual hasil panen', example:'JUAL_SAWIT 100kg', tag:'#ekonomi'},
+            {name:'HARGA_SAWIT', desc:'Cek harga pasar', example:'HARGA_SAWIT', tag:'#ekonomi'},
+            
+            // DATA STRUCTURES
+            {name:'SAWIT.ARRAY', desc:'Membuat array', example:'SAWIT.ARRAY kebun = [1,2,3]', tag:'#data'},
+            {name:'SAWIT.OBJEK', desc:'Membuat objek', example:'SAWIT.OBJEK pohon = { umur:2 }', tag:'#data'},
+            {name:'SAWIT.LIST', desc:'Membuat list', example:'SAWIT.LIST bibit', tag:'#data'},
+            
+            // INPUT/OUTPUT
+            {name:'SAWIT.BACA', desc:'Membaca input user', example:'SAWIT.BACA nama', tag:'#io'},
+            {name:'SAWIT.TULIS', desc:'Menulis ke file', example:'SAWIT.TULIS "data.txt"', tag:'#io'},
+            {name:'SAWIT.BACA_FILE', desc:'Membaca file', example:'SAWIT.BACA_FILE "data.txt"', tag:'#io'},
+            
+            // UTILITY
+            {name:'SAWIT.ACAK', desc:'Angka acak', example:'SAWIT.ACAK 1 100', tag:'#util'},
+            {name:'SAWIT.TUNGGU', desc:'Menunggu (detik)', example:'SAWIT.TUNGGU 5', tag:'#time'},
+            {name:'SAWIT.WAKTU', desc:'Waktu sekarang', example:'SAWIT.WAKTU', tag:'#time'},
+            {name:'SAWIT.HAPUS', desc:'Hapus variabel', example:'SAWIT.HAPUS x', tag:'#util'},
+            
+            // FUNCTION COMMANDS
+            {name:'SAWIT.FUNGSI', desc:'Membuat fungsi', example:'SAWIT.FUNGSI tambah(a,b) { a+b }', tag:'#func'},
+            {name:'SAWIT.PANGGIL', desc:'Memanggil fungsi', example:'SAWIT.PANGGIL tambah(2,3)', tag:'#func'},
+            {name:'SAWIT.KEMBALI', desc:'Return nilai', example:'SAWIT.KEMBALI hasil', tag:'#func'},
+            
+            // ADVANCED
+            {name:'IMPORT', desc:'Mengimpor library', example:'IMPORT "pupuk.sawit"', tag:'#module'},
+            {name:'EXPORT', desc:'Mengekspor fungsi', example:'EXPORT panenRaya', tag:'#module'},
+            {name:'SAWIT.EVAL', desc:'Evaluasi expression', example:'SAWIT.EVAL "x + y"', tag:'#advanced'},
+            
+            // SYSTEM
+            {name:'SAWIT.MEMORI', desc:'Cek penggunaan memori', example:'SAWIT.MEMORI', tag:'#system'},
+            {name:'SAWIT.RESET', desc:'Reset interpreter', example:'SAWIT.RESET', tag:'#system'},
+            {name:'SAWIT.EXIT', desc:'Keluar program', example:'SAWIT.EXIT', tag:'#system'},
+            
+            // EXTRA SAWIT
+            {name:'CANGKUL', desc:'Menggemburkan tanah', example:'CANGKUL', tag:'#sawit'},
+            {name:'SIram', desc:'Menyiram tanaman', example:'SIRAM 5 liter', tag:'#sawit'},
+            {name:'PESTISIDA', desc:'Menyemprot hama', example:'PESTISIDA', tag:'#sawit'},
+            {name:'TUNAS', desc:'Memotong tunas', example:'TUNAS', tag:'#sawit'},
+            {name:'GRADING', desc:'Menggreding buah', example:'GRADING hasil', tag:'#sawit'}
+        ]
+
+        function renderCmd(){
+            let html=''
+            commands.forEach((c,i)=>html+=`
+                <div class="cmd-item" onclick="runCmd('${c.name}')">
+                    <div class="cmd-name">${c.name}</div>
+                    <div class="cmd-desc">${c.desc}</div>
+                    <div class="cmd-example">${c.example}</div>
+                    <span class="cmd-tag">${c.tag}</span>
+                </div>
+            `)
+            document.getElementById('cmdGrid').innerHTML=html
+        }
+        renderCmd()
+
+        function toggleCmd(){
+            document.getElementById('cmdGrid').classList.toggle('show')
+        }
+
+        function runSawit(){
+            let out=document.getElementById('outputText')
+            out.innerHTML='🌴 SAWIT INTERPRETER v1.0\n> MEMORI: 64MB\n> BIBIT TERSEDIA: 100🗿\n> SAWIT READY\n'
+        }
+
+        function executeCmd(){
+            let cmd=document.getElementById('cmdInput').value.trim()
+            let out=document.getElementById('outputText')
+            if(!cmd) return
+            
+            let lower = cmd.toLowerCase()
+            let response = ''
+            
+            if(lower.includes('tanam')) response = '🌱 Menanam bibit... Berhasil! (+5 sawit)'
+            else if(lower.includes('panen')) response = '🌾 Panen! Mendapatkan 10 tandan sawit'
+            else if(lower.includes('bibit')) response = '🌰 Bibit tersedia: 1.000'
+            else if(lower.includes('pupuk')) response = '🧪 Memberi pupuk... Tanaman subur!'
+            else if(lower.includes('tebang')) response = '⚠️ Menebang semua tanaman! Memori dibersihkan'
+            else if(lower.includes('harga')) response = '💰 Harga sawit: Rp 2.500/kg'
+            else if(lower.includes('jual')) response = '💸 Menjual sawit... Transaksi berhasil! +Rp 250.000'
+            else if(lower.includes('hama')) response = '🐛 Cek hama: Tidak ada hama'
+            else if(lower.includes('info')) response = '📊 Status: Bibit 10, Panen 5, Pupuk 3'
+            else if(lower.includes('help')) response = '📚 Command: TANAM, PANEN, BIBIT, PUPUK, TEBANG, HARGA, DLL'
+            else if(lower.includes('versi')) response = '📌 Sawit Interpreter v1.0.0'
+            else if(lower.includes('clear')) {
+                out.innerHTML = '🌴 SAWIT READY\n'
+                document.getElementById('cmdInput').value=''
+                return
+            }
+            else response = ' Command diterima wok: ' + cmd
+            
+            out.innerHTML += `\n> ${cmd}\n> ${response}`
+            document.getElementById('cmdInput').value=''
+            out.scrollTop=out.scrollHeight
+        }
+
+        function runCmd(name){
+            document.getElementById('cmdInput').value=name
+            executeCmd()
+            document.getElementById('cmdGrid').classList.remove('show')
+        }
+    </script>
+</body>
+  </html>
